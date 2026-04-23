@@ -1,5 +1,7 @@
 # 🚀 Django Clean Monolith: De Spaghetti a Grado Empresarial
 
+# tutorialDjango
+
 Este proyecto es una guía práctica para transformar una aplicación de Django tradicional en un sistema con arquitectura de capas, siguiendo principios de ingeniería de software utilizados en consultoría de alto nivel.
 
 ---

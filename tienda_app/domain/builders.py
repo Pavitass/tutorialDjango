@@ -5,25 +5,25 @@ from ..models import Orden
 
 
 class OrdenBuilder:
+    """
+    Builder fluido: acumula datos y en build() aplica IVA (1.19) y persiste Orden.
+    lista_productos: iterable de (Libro, cantidad).
+    """
+
     def __init__(self):
         self.reset()
 
     def reset(self):
         self._usuario = None
-        self._libro = None
-        self._cantidad = 1
+        self._productos = []
         self._direccion = ""
 
     def con_usuario(self, usuario):
         self._usuario = usuario
         return self
 
-    def con_libro(self, libro):
-        self._libro = libro
-        return self
-
-    def con_cantidad(self, cantidad):
-        self._cantidad = cantidad
+    def con_productos(self, lista_productos):
+        self._productos = list(lista_productos)
         return self
 
     def para_envio(self, direccion):
@@ -31,15 +31,18 @@ class OrdenBuilder:
         return self
 
     def build(self) -> Orden:
-        if not self._libro:
+        if not self._productos:
             raise ValueError("Datos insuficientes para crear la orden.")
 
-        total_unitario = CalculadorImpuestos.obtener_total_con_iva(self._libro.precio)
-        total = Decimal(total_unitario) * self._cantidad
+        total = Decimal(0)
+        for libro, cantidad in self._productos:
+            unitario_iva = CalculadorImpuestos.obtener_total_con_iva(libro.precio)
+            total += Decimal(str(unitario_iva)) * cantidad
 
+        libro = self._productos[0][0]
         orden = Orden.objects.create(
             usuario=self._usuario,
-            libro=self._libro,
+            libro=libro,
             total=total,
             direccion_envio=self._direccion,
         )

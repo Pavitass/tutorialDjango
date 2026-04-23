@@ -7,8 +7,7 @@ from .models import Inventario, Libro
 
 class CompraService:
     """
-    SERVICE LAYER: Orquesta la interacción entre el dominio,
-    la infraestructura y la base de datos.
+    SERVICE LAYER: usa la fábrica de pago (inyectada) y el builder de órdenes.
     """
 
     def __init__(self, procesador_pago):
@@ -28,15 +27,13 @@ class CompraService:
             raise ValueError("No hay suficiente stock para completar la compra.")
 
         orden = (
-            self.builder
-            .con_usuario(usuario)
-            .con_libro(libro)
-            .con_cantidad(cantidad)
+            self.builder.con_usuario(usuario)
+            .con_productos([(libro, cantidad)])
             .para_envio(direccion)
             .build()
         )
 
-        pago_exitoso = self.procesador_pago.pagar(orden.total)
+        pago_exitoso = self.procesador_pago.pagar(float(orden.total))
         if not pago_exitoso:
             orden.delete()
             raise Exception("La transacción fue rechazada por el banco.")
