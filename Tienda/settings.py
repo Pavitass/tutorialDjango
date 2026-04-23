@@ -31,7 +31,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "1").lower() in ("1", "true", "yes", "on"
 
 ALLOWED_HOSTS = [
     h.strip()
-    for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,0.0.0.0").split(",")
     if h.strip()
 ]
 
@@ -88,11 +88,11 @@ if DB_ENGINE == "postgres":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("POSTGRES_DB", "tienda"),
-            "USER": os.environ.get("POSTGRES_USER", "tienda"),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "tienda"),
-            "HOST": os.environ.get("POSTGRES_HOST", "db"),
-            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+            "NAME": os.environ.get("DB_NAME") or os.environ.get("POSTGRES_DB", "tienda"),
+            "USER": os.environ.get("DB_USER") or os.environ.get("POSTGRES_USER", "tienda"),
+            "PASSWORD": os.environ.get("DB_PASSWORD") or os.environ.get("POSTGRES_PASSWORD", "tienda"),
+            "HOST": os.environ.get("DB_HOST") or os.environ.get("POSTGRES_HOST", "db"),
+            "PORT": os.environ.get("DB_PORT") or os.environ.get("POSTGRES_PORT", "5432"),
         }
     }
 else:

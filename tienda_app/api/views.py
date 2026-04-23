@@ -4,10 +4,21 @@ from rest_framework.views import APIView
 
 from ..infra.factories import PaymentFactory
 from ..services import CompraService
-from .serializers import OrdenInputSerializer
+from ..models import Libro
+from .serializers import LibroSerializer, OrdenInputSerializer
 
 
 class CompraAPIView(APIView):
+    def get(self, request):
+        serializer = OrdenInputSerializer()
+        return Response(
+            {
+                "detail": "Usa POST con libro_id y direccion_envio para comprar.",
+                "fields": serializer.get_fields().keys(),
+                "example": {"libro_id": 1, "direccion_envio": "Calle 123"},
+            }
+        )
+
     def post(self, request):
         serializer = OrdenInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -29,4 +40,10 @@ class CompraAPIView(APIView):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"total": float(total)}, status=status.HTTP_201_CREATED)
+
+
+class ProductosAPIView(APIView):
+    def get(self, request):
+        libros = Libro.objects.all().order_by("id")
+        return Response(LibroSerializer(libros, many=True).data)
 
